@@ -1,5 +1,6 @@
 
 
+
 #if (!require("haven")) install.packages("haven") # Installs haven if needed
 if (!require("foreign")) install.packages("foreign") # Installs foreign if needed
 if (!require("tidyverse")) install.packages("tidyverse") # Installs tidyverse if needed
@@ -8,19 +9,17 @@ if (!require("tidyverse")) install.packages("tidyverse") # Installs tidyverse if
 if (!require("ggplot2")) install.packages("ggplot2") # Installs ggplot2 if needed
 if (!require("data.table")) install.packages("data.table") # Installs data.table if needed
 
-install.packages(" tidyverse")
 
-library(magrittr)
+#library(magrittr)
 
 
-#library(haven)
+library(haven)
 library(foreign)
-library(tidyverse)
-#library(dplyr)
+library(dplyr)
 #library(corrr)
 library(ggplot2)
 library(data.table)
-
+library(tidyverse)
 
 #### Joël, is it possible that you forgot to add some of the libraries in the code you supplied? I used "tidyverse" to load the data.
 #### I do not know what package you used to be able to change all the datasets to factors
@@ -35,30 +34,70 @@ datPH <- read_dta("//bfh.ch/data/LFE/G/Research-HE/data/SHARE/rel7-0-0/sharew7_r
 
 #Filter Swiss observations
 datHC<-datHC %>% filter(as_factor(datHC$country)=="Switzerland")
-datXT<-datXT %>% filter(as_factor(datHC$country)=="Switzerland")
-datPH<-datPH %>% filter(as_factor(datHC$country)=="Switzerland")
+datXT<-datXT %>% filter(as_factor(datXT$country)=="Switzerland")
+datPH<-datPH %>% filter(as_factor(datPH$country)=="Switzerland")
 
 
 #Construct working database
 dat_SHARE_ChinSwee<-merge(datPH, datHC, by="mergeid")
 dat_SHARE_ChinSwee<-full_join(datXT,dat_SHARE_ChinSwee,by="mergeid")
-dat_SHARE_ChinSwee$status[dat$mergeid=="Cf-042858-01"]
 
 
-dat_SHARE_ChinSwee$ph089d1==1
-summary(dat_SHARE_ChinSwee$ph089d1)
-dat_SHARE_ChinSwee$ph089d1!="Selected"
+#dat_SHARE_ChinSwee$ph089d1==1
+#summary(dat_SHARE_ChinSwee$ph089d1)
+#dat_SHARE_ChinSwee$ph089d1!="Selected"
 
-dat_SHARE_ChinSwee$a<-ifelse(dat_SHARE_ChinSwee$ph065_=="No", 1,0)
+##############Survey questions used for segmentation#####################
+
+
+#a#############PH065_CheckLossWeight
+#Haben Sie in den letzten 12 Monaten abgenommen?
+#Have you lost weight in the last 12 months?
+#VALUE      LABEL
+#     -2    Refusal
+#     -1    Don't know
+#     1     Yes
+#     5     No
+
+#TABLE
+#-2   -1    1     5 
+#1    6     503   1886
+table(dat_SHARE_ChinSwee$ph065_)
+view(dat_SHARE_ChinSwee$ph065_)
+dat_SHARE_ChinSwee$a<-ifelse(dat_SHARE_ChinSwee$ph065_==5, 1,0)
+table(dat_SHARE_ChinSwee$a)
+
+#b#############PH095_HowMuchLostWeight
+#Wie viel Gewicht haben Sie abgenommen?
+#How much weight have you lost?
+#VALUE      LABEL
+#   -2      Refusal
+#   -1      Don't know
+
+#TABLE
+#-1  1  2  3  4  5  6  7  8  9 10 12 13 14 15 16 18 20 21 23 24 26 30 35 50 
+#2  32 92 91 63 74 31 19 27  7 29 12  1  2  3  2  2  5  1  1  1  1  3  1  1
+
+list(dat_SHARE_ChinSwee$ph095_)
+table(dat_SHARE_ChinSwee$ph095_)
 dat_SHARE_ChinSwee$b<-ifelse(dat_SHARE_ChinSwee$ph095_<5,1,0)
+
 dat_SHARE_ChinSwee$c<-ifelse((dat_SHARE_ChinSwee$ph066_=="Followed a special diet"|dat_SHARE_ChinSwee$ph066_=="Due to illness and followed a special diet"),1,0)
+
 dat_SHARE_ChinSwee$d<-ifelse(dat_SHARE_ChinSwee$ph089d1=="Selected",1,0)
+
 dat_SHARE_ChinSwee$e<-ifelse((dat_SHARE_ChinSwee$ph006d1=="Selected"|dat_SHARE_ChinSwee$ph006d2=="Selected"|dat_SHARE_ChinSwee$ph006d3=="Selected"|dat_SHARE_ChinSwee$ph006d4=="Selected"|dat_SHARE_ChinSwee$ph006d5=="Selected"|dat_SHARE_ChinSwee$ph006d6=="Selected"|dat_SHARE_ChinSwee$ph006d10=="Selected"|dat_SHARE_ChinSwee$ph006d11=="Selected"|dat_SHARE_ChinSwee$ph006d13=="Selected"|dat_SHARE_ChinSwee$ph006d14=="Selected"|dat_SHARE_ChinSwee$ph006d15=="Selected"|dat_SHARE_ChinSwee$ph006d16=="Selected"|dat_SHARE_ChinSwee$ph006d19=="Selected"|dat_SHARE_ChinSwee$ph006d20=="Selected"),1,0)
+
 dat_SHARE_ChinSwee$f<-ifelse(is.na(dat_SHARE_ChinSwee$e),0,1)
+
 dat_SHARE_ChinSwee$g<-ifelse(dat_SHARE_ChinSwee$ph005_=="Not limited",1,0)
+
 dat_SHARE_ChinSwee$h<-ifelse(dat_SHARE_ChinSwee$hc602_>=3,1,0)
+
 dat_SHARE_ChinSwee$i<-ifelse(dat_SHARE_ChinSwee$hc014_>=3,1,0)
+
 dat_SHARE_ChinSwee$j<-ifelse(dat_SHARE_ChinSwee$hc013_>=3,1,0)
+
 dat_SHARE_ChinSwee$k<-ifelse(dat_SHARE_ChinSwee$xt009_>0|is.na(dat_SHARE_ChinSwee$xt009_),1,0)
 
 
