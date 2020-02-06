@@ -8,17 +8,19 @@ if (!require("tidyverse")) install.packages("tidyverse") # Installs tidyverse if
 if (!require("ggplot2")) install.packages("ggplot2") # Installs ggplot2 if needed
 if (!require("data.table")) install.packages("data.table") # Installs data.table if needed
 
+install.packages(" tidyverse")
 
 library(magrittr)
 
 
-library(haven)
+#library(haven)
 library(foreign)
-library(dplyr)
+library(tidyverse)
+#library(dplyr)
 #library(corrr)
 library(ggplot2)
 library(data.table)
-library(tidyverse)
+
 
 #### Joël, is it possible that you forgot to add some of the libraries in the code you supplied? I used "tidyverse" to load the data.
 #### I do not know what package you used to be able to change all the datasets to factors
