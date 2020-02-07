@@ -220,8 +220,6 @@ dat_SHARE_ChinSwee$d<-ifelse(dat_SHARE_ChinSwee$ph089d1==1,1,0)
 # 1     Selected
 
 
-####Joël, please double-check the chronic illnesses specified. The numbers are not the same as your pdf. 
-#If you change something, please be consistent and change it in both functions here.
 
 dat_SHARE_ChinSwee$e<-ifelse( (dat_SHARE_ChinSwee$ph006d1==1
                                |dat_SHARE_ChinSwee$ph006d2==1
