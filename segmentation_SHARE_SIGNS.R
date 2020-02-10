@@ -9,7 +9,7 @@ if (!require("foreign")) install.packages("foreign") # Installs foreign if neede
 if (!require("tidyverse")) install.packages("tidyverse") # Installs tidyverse if needed
 #if (!require("dplyr")) install.packages("dplyr") # Installs dplyr if needed
 #if (!require("corrr")) install.packages("corrr") # Installs corrr if needed
-if (!require("ggplot2")) install.packages("ggplot2") # Installs ggplot2 if needed
+#if (!require("ggplot2")) install.packages("ggplot2") # Installs ggplot2 if needed
 if (!require("data.table")) install.packages("data.table") # Installs data.table if needed
 
 
@@ -17,11 +17,11 @@ if (!require("data.table")) install.packages("data.table") # Installs data.table
 
 
 library(haven)
-library(foreign)
-library(dplyr)
+#library(foreign)
+#library(dplyr)
 #library(corrr)
-library(ggplot2)
-library(data.table)
+#library(ggplot2)
+#library(data.table)
 library(tidyverse)
 
 #### Joël, is it possible that you forgot to add some of the libraries in the code you supplied? I used "tidyverse" to load the data.
@@ -45,10 +45,6 @@ datPH<-datPH %>% filter(as_factor(datPH$country)=="Switzerland")
 dat_SHARE_ChinSwee<-merge(datPH, datHC, by="mergeid")
 dat_SHARE_ChinSwee<-full_join(datXT,dat_SHARE_ChinSwee,by="mergeid")
 
-
-#dat_SHARE_ChinSwee$ph089d1==1
-#summary(dat_SHARE_ChinSwee$ph089d1)
-#dat_SHARE_ChinSwee$ph089d1!="Selected"
 
 ##############Survey questions used for segmentation#####################
 
@@ -425,10 +421,6 @@ dat_SHARE_ChinSwee$health_state<-
 
 
 table(dat_SHARE_ChinSwee$health_state)
-
-
-lize<-dat_SHARE_ChinSwee[which(dat_SHARE_ChinSwee$health_state=="lost"),]
-
 
 
 rm(list = ls(all.names = TRUE)) #will clear all objects includes hidden objects.
