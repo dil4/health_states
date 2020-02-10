@@ -43,49 +43,6 @@ dat_SHARE_ChinSwee<-merge(datPH, datHC, by="mergeid")
 dat_SHARE_ChinSwee<-full_join(datXT,dat_SHARE_ChinSwee,by="mergeid")
 
 
-
-#if (!require("haven")) install.packages("haven") # Installs haven if needed
-if (!require("foreign")) install.packages("foreign") # Installs foreign if needed
-if (!require("tidyverse")) install.packages("tidyverse") # Installs tidyverse if needed
-#if (!require("dplyr")) install.packages("dplyr") # Installs dplyr if needed
-#if (!require("corrr")) install.packages("corrr") # Installs corrr if needed
-if (!require("ggplot2")) install.packages("ggplot2") # Installs ggplot2 if needed
-if (!require("data.table")) install.packages("data.table") # Installs data.table if needed
-
-
-#library(magrittr)
-
-
-library(haven)
-library(foreign)
-library(dplyr)
-#library(corrr)
-library(ggplot2)
-library(data.table)
-library(tidyverse)
-
-#### Joël, is it possible that you forgot to add some of the libraries in the code you supplied? I used "tidyverse" to load the data.
-#### I do not know what package you used to be able to change all the datasets to factors
-#### Please remove the SHARE data from your computer. It should be on the KPM server only and you should "fetch" it from there.
-
-
-###Load data from server
-datXT <- read_dta("//bfh.ch/data/LFE/G/Research-HE/data/SHARE/rel7-0-0/sharew7_rel7-0-0/sharew7_rel7-0-0_ALL_datasets_stata/sharew7_rel7-0-0_xt.dta")
-datHC <- read_dta("//bfh.ch/data/LFE/G/Research-HE/data/SHARE/rel7-0-0/sharew7_rel7-0-0/sharew7_rel7-0-0_ALL_datasets_stata/sharew7_rel7-0-0_hc.dta")
-datPH <- read_dta("//bfh.ch/data/LFE/G/Research-HE/data/SHARE/rel7-0-0/sharew7_rel7-0-0/sharew7_rel7-0-0_ALL_datasets_stata/sharew7_rel7-0-0_ph.dta")
-
-
-#Filter Swiss observations
-datHC<-datHC %>% filter(as_factor(datHC$country)=="Switzerland")
-datXT<-datXT %>% filter(as_factor(datXT$country)=="Switzerland")
-datPH<-datPH %>% filter(as_factor(datPH$country)=="Switzerland")
-
-
-#Construct working database
-dat_SHARE_ChinSwee<-merge(datPH, datHC, by="mergeid")
-dat_SHARE_ChinSwee<-full_join(datXT,dat_SHARE_ChinSwee,by="mergeid")
-
-
 #dat_SHARE_ChinSwee$ph089d1==1
 #summary(dat_SHARE_ChinSwee$ph089d1)
 #dat_SHARE_ChinSwee$ph089d1!="Selected"
@@ -220,6 +177,8 @@ dat_SHARE_ChinSwee$d<-ifelse(dat_SHARE_ChinSwee$ph089d1==1,1,0)
 # 1     Selected
 
 
+####Joël, please double-check the chronic illnesses specified. The numbers are not the same as your pdf. 
+#If you change something, please be consistent and change it in both functions here.
 
 dat_SHARE_ChinSwee$e<-ifelse( (dat_SHARE_ChinSwee$ph006d1==1
                                |dat_SHARE_ChinSwee$ph006d2==1
@@ -331,7 +290,7 @@ dat_SHARE_ChinSwee$g<-ifelse(dat_SHARE_ChinSwee$ph005_==3,1,0)
 #48  50  54  55  60  70  80 100 120 180 365 366 
 #3   4   1   1   3   1   1   4   1   1   1   4
 
-dat_SHARE_ChinSwee$h<-ifelse(dat_SHARE_ChinSwee$hc602_>=6,1,0)
+dat_SHARE_ChinSwee$h<-ifelse(dat_SHARE_ChinSwee$hc602_>=8,1,0)
 
 table(dat_SHARE_ChinSwee$h)
 #h=1  Spoken the doctor or nurse practitioner 6 or more than times per year
@@ -367,7 +326,7 @@ table(dat_SHARE_ChinSwee$h)
 #56  63  70 100 175 
 # 1   1   1   2   1 
 
-dat_SHARE_ChinSwee$i<-ifelse(dat_SHARE_ChinSwee$hc014_>=6,1,0)
+dat_SHARE_ChinSwee$i<-ifelse(dat_SHARE_ChinSwee$hc014_>=8,1,0)
 
 
 table(dat_SHARE_ChinSwee$i)
@@ -396,7 +355,7 @@ table(dat_SHARE_ChinSwee$i)
 #  0   1   2   3   4   5   7   8   9  10 
 #  3 284  64  25   6   9   8   3   1  18 
 
-dat_SHARE_ChinSwee$j<-ifelse(dat_SHARE_ChinSwee$hc013_>=6,1,0)
+dat_SHARE_ChinSwee$j<-ifelse(dat_SHARE_ChinSwee$hc013_>=8,1,0)
 
 
 table(dat_SHARE_ChinSwee$j)
@@ -409,19 +368,7 @@ table(dat_SHARE_ChinSwee$j)
 
 ########################################################################
 #k#############language_xt
-#Wie oft sind Sie während den letzten 12 Monaten für mindestens eine Nacht im Spital gewesen?
 
-#How often have you spent at least one night in hospital during the last 12 months?
-
-#list(dat_SHARE_ChinSwee$hc013_)
-#  value  label
-#-2    Refusal
-#-1 Don't know
-
-#table(dat_SHARE_ChinSwee$hc013_)
-#TABLE
-#  0   1   2   3   4   5   7   8   9  10 
-#  3 284  64  25   6   9   8   3   1  18 
 
 dat_SHARE_ChinSwee$k<-is.na(ifelse(dat_SHARE_ChinSwee$language_xt>0,1,0))
 
@@ -440,7 +387,7 @@ table(dat_SHARE_ChinSwee$k)
 
 dat_SHARE_ChinSwee$health_state<- 
   ifelse(
-    ak==F,
+    dat_SHARE_ChinSwee$k==F,
     "Dead",
     ifelse(
       (dat_SHARE_ChinSwee$f==1&dat_SHARE_ChinSwee$e==0&dat_SHARE_ChinSwee$d==0)&(dat_SHARE_ChinSwee$a==1|dat_SHARE_ChinSwee$b==1|dat_SHARE_ChinSwee$c==1),
@@ -452,13 +399,13 @@ dat_SHARE_ChinSwee$health_state<-
           ((dat_SHARE_ChinSwee$g==1&dat_SHARE_ChinSwee$e==1&dat_SHARE_ChinSwee$d==0)&(dat_SHARE_ChinSwee$a==1|dat_SHARE_ChinSwee$b==1|dat_SHARE_ChinSwee$c==1))|((dat_SHARE_ChinSwee$g==1&dat_SHARE_ChinSwee$d==1)&(dat_SHARE_ChinSwee$a==1|dat_SHARE_ChinSwee$b==1|dat_SHARE_ChinSwee$c==1))|((dat_SHARE_ChinSwee$g==1)&(dat_SHARE_ChinSwee$a==0&dat_SHARE_ChinSwee$b==0&dat_SHARE_ChinSwee$c==0)),
           "Chronic Asymptomatic",
           ifelse(
-            (dat_SHARE_ChinSwee$h==1&dat_SHARE_ChinSwee$g!=1&dat_SHARE_ChinSwee$e!=0),
+            (dat_SHARE_ChinSwee$h==1),
             "1 Long Course of Decline",
             ifelse(
-              (dat_SHARE_ChinSwee$i==1&dat_SHARE_ChinSwee$h==0&dat_SHARE_ChinSwee$g!=1&dat_SHARE_ChinSwee$e!=0),
+              (dat_SHARE_ChinSwee$i==1),
               "2 Long Course of Decline",
               ifelse(
-                (dat_SHARE_ChinSwee$j==1&dat_SHARE_ChinSwee$i==0&dat_SHARE_ChinSwee$h==0&dat_SHARE_ChinSwee$g!=1&dat_SHARE_ChinSwee$e!=0),
+                (dat_SHARE_ChinSwee$j==1),
                 "3 Long Course of Decline",
                 ifelse(
                   (dat_SHARE_ChinSwee$j==0&dat_SHARE_ChinSwee$i==0&dat_SHARE_ChinSwee$h==0&dat_SHARE_ChinSwee$g!=1&dat_SHARE_ChinSwee$e!=0),
@@ -473,10 +420,11 @@ dat_SHARE_ChinSwee$health_state<-
     )
   )
 
+
 table(dat_SHARE_ChinSwee$health_state)
 
 
-
+lize<-dat_SHARE_ChinSwee[which(dat_SHARE_ChinSwee$health_state=="lost"),]
 
 
 
