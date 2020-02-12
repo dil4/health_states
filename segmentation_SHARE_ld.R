@@ -46,6 +46,8 @@ datGS<-datGS %>% filter(as_factor(datGS$country)=="Switzerland")
 datPH<-datPH %>% filter(as_factor(datPH$country)=="Switzerland")
 datCV<-datCV %>% filter(as_factor(datCV$country)=="Switzerland")
 
+#Keep only correspondants of current wave as well as deceased correspondants
+datCV<-rbind(datCV[datCV$deceased==1,],datCV[datCV$age_int!=-9,])
 
 
 #Remove variables that are duplicated accross datasets
@@ -369,6 +371,71 @@ table(dat_SHARE_ld$i)
 #j#############Frailty Indicators
 
 
+dat_SHARE_ld$age_int ###Age at interview
+
+list(dat_SHARE_ld$gender) ###Gender
+#value      label
+#-2    Refusal
+#-1 Don't know
+#1       Male
+#2     Female
+
+list(dat_SHARE_ld$gs004_) ###DominantHand
+#value         label
+#-2       Refusal
+#-1    Don't know
+# 1    Right hand
+# 2     Left hand
+# 3 Ambidexterity
+
+#Participant is deemed to have low hand grip strength if the average measurement for both the dominant hand 
+#as well as the average measurement for the non-dominant hand is less or equal to one standard deviation 
+#less than the average normative age-sex-dominance-specific values for the Swiss population as determined by:
+#Werle, S., Goldhahn, J., Drerup, S., Simmen, B.R., Sprott, H. and Herren, D.B., 2009. Age-and gender-specific 
+#normative data of grip and pinch strength in a healthy adult Swiss population. Journal of Hand Surgery 
+#(European Volume), 34(1), pp.76-84.
+
+
+dat_SHARE_ld$l_ave<-(dat_SHARE_ld$gs006_+dat_SHARE_ld$gs007_)/2
+dat_SHARE_ld$r_ave<-(dat_SHARE_ld$gs008_+dat_SHARE_ld$gs009_)/2
+
+####Dominant hand
+dat_SHARE_ld$d_ave<-isTRUE(dat_SHARE_ld$gs004_==2)*l_ave+(1-isTRUE(dat_SHARE_ld$gs004_==2))*r_ave
+#label(d_ave) <- "Average handgrip dominant hand"
+
+dat_SHARE_ld$row_num<-(dat_hand_grip$Gender==dat_SHARE_ld$gender&dat_hand_grip$Age_min<=dat_SHARE_ld$age_int&dat_hand_grip$Age_max>=dat_SHARE_ld$age_int&dat_hand_grip$Hand=="D")
+dat_SHARE_ld$a<-dat_SHARE_ld$gender
+d_mean_hand_grip<-dat_hand_grip[(dat_hand_grip$Gender==dat_SHARE_ld$gender&dat_hand_grip$Age_min<=dat_SHARE_ld$age_int&dat_hand_grip$Age_max>=dat_SHARE_ld$age_int&dat_hand_grip$Hand=="D"),"Mean"]
+
+for (i in 1:nrow(dat_SHARE_ld)){
+  #dat_SHARE_ld[i,"a"]<-which((dat_hand_grip$Gender==dat_SHARE_ld[i,"gender"]&dat_hand_grip$Age_min<=dat_SHARE_ld[i,"age_int"]&dat_hand_grip$Age_max>=dat_SHARE_ld[i,"age_int"]&dat_hand_grip$Hand=="D")==TRUE)
+  #print(i)
+  print(gender dat_SHARE_ld[i,"gender"], int age dat_SHARE_ld[i,"age_int"])
+  #dat_SHARE_ld[i,"a"]<-print(which((dat_hand_grip$Gender==dat_SHARE_ld[i,"gender"]&dat_hand_grip$Age_min<=dat_SHARE_ld[i,"age_int"]&dat_hand_grip$Age_max>=dat_SHARE_ld[i,"age_int"]&dat_hand_grip$Hand=="D")==TRUE))
+}
+
+for (i in 1:nrow(dat_SHARE_ld))
+{dat_SHARE_ld[i,"lize"]<-which((dat_hand_grip$Gender==dat_SHARE_ld[i,"gender"]&dat_hand_grip$Age_min<=dat_SHARE_ld[i,"age_int"]&dat_hand_grip$Age_max>=dat_SHARE_ld[i,"age_int"]&dat_hand_grip$Hand=="D")==TRUE)}
+
+which((dat_hand_grip$Gender==dat_SHARE_ld[4,"gender"]&dat_hand_grip$Age_min<=dat_SHARE_ld[4,"age_int"]&dat_hand_grip$Age_max>=dat_SHARE_ld[4,"age_int"]&dat_hand_grip$Hand=="D")==TRUE)
+
+
+d_std_hand_grip<-dat_hand_grip[(dat_hand_grip$Gender==dat_SHARE_ld$gender&dat_hand_grip$Age_min<=dat_SHARE_ld$age_int&dat_hand_grip$Age_max>=dat_SHARE_ld$age_int&dat_hand_grip$Hand=="D"),"SD_AbsoluteVal"]
+dat_SHARE_ld$d_hand_grip_threshhold<-mean_hand_grip-std_hand_grip
+
+dat_SHARE_ld$d_low_hand_grip<-(dat_SHARE_ld$d_hand_grip_threshhold>=dat_SHARE_ld$d_ave)
+
+
+nd_ave<-isTRUE(dat_SHARE_ld$gs004_==2)*r_ave+(1-isTRUE(dat_SHARE_ld$gs004_==2))*l_ave
+#label(d_ave) <- "Average handgrip non-dominant hand"
+
+d_mean_hand_grip<-dat_hand_grip[(dat_hand_grip$Gender==dat_SHARE_ld$gender&dat_hand_grip$Age_min<=dat_SHARE_ld$age_int&dat_hand_grip$Age_max>=dat_SHARE_ld$age_int&dat_hand_grip$Hand=="D"),"Mean"]
+d_std_hand_grip<-dat_hand_grip[(dat_hand_grip$Gender==dat_SHARE_ld$gender&dat_hand_grip$Age_min<=dat_SHARE_ld$age_int&dat_hand_grip$Age_max>=dat_SHARE_ld$age_int&dat_hand_grip$Hand=="D"),"SD_AbsoluteVal"]
+d_hand_grip_threshhold<-mean_hand_grip-std_hand_grip
+
+nd_mean_hand_grip<-dat_hand_grip[(dat_hand_grip$Gender==dat_SHARE_ld$gender&dat_hand_grip$Age_min<=dat_SHARE_ld$age_int&dat_hand_grip$Age_max>=dat_SHARE_ld$age_int&dat_hand_grip$Hand=="ND"),"Mean"]
+nd_std_hand_grip<-dat_hand_grip[(dat_hand_grip$Gender==dat_SHARE_ld$gender&dat_hand_grip$Age_min<=dat_SHARE_ld$age_int&dat_hand_grip$Age_max>=dat_SHARE_ld$age_int&dat_hand_grip$Hand=="ND"),"SD_AbsoluteVal"]
+nd_hand_grip_threshhold<-mean_hand_grip-std_hand_grip 
 
 #j1#############HC013_TiminHos
 #Wie oft sind Sie während den letzten 12 Monaten für mindestens eine Nacht im Spital gewesen?

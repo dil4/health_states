@@ -36,6 +36,9 @@ datHC<-datHC %>% filter(as_factor(datHC$country)=="Switzerland")
 datPH<-datPH %>% filter(as_factor(datPH$country)=="Switzerland")
 datCV<-datCV %>% filter(as_factor(datCV$country)=="Switzerland")
 
+#Keep only correspondants of current wave as well as deceased correspondants
+datCV<-rbind(datCV[datCV$deceased==1,],datCV[datCV$age_int!=-9,])
+
 #Remove variables that are duplicated accross datasets
 #datHC2<-cbind(datHC[,1],datHC[,8:71])
 #datCF2<-cbind(datCF[,1],datCF[,7:37])
