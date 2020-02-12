@@ -24,26 +24,31 @@ library(haven)
 #library(data.table)
 library(tidyverse)
 
-#### Joël, is it possible that you forgot to add some of the libraries in the code you supplied? I used "tidyverse" to load the data.
-#### I do not know what package you used to be able to change all the datasets to factors
-#### Please remove the SHARE data from your computer. It should be on the KPM server only and you should "fetch" it from there.
-
 
 ###Load data from server
-datXT <- read_dta("//bfh.ch/data/LFE/G/Research-HE/data/SHARE/rel7-0-0/sharew7_rel7-0-0/sharew7_rel7-0-0_ALL_datasets_stata/sharew7_rel7-0-0_xt.dta")
-datHC <- read_dta("//bfh.ch/data/LFE/G/Research-HE/data/SHARE/rel7-0-0/sharew7_rel7-0-0/sharew7_rel7-0-0_ALL_datasets_stata/sharew7_rel7-0-0_hc.dta")
-datPH <- read_dta("//bfh.ch/data/LFE/G/Research-HE/data/SHARE/rel7-0-0/sharew7_rel7-0-0/sharew7_rel7-0-0_ALL_datasets_stata/sharew7_rel7-0-0_ph.dta")
+datHC<-read_dta("//bfh.ch/data/LFE/G/Research-HE/data/SHARE/rel7-0-0/sharew7_rel7-0-0/sharew7_rel7-0-0_ALL_datasets_stata/sharew7_rel7-0-0_hc.dta")
+datPH<-read_dta("//bfh.ch/data/LFE/G/Research-HE/data/SHARE/rel7-0-0/sharew7_rel7-0-0/sharew7_rel7-0-0_ALL_datasets_stata/sharew7_rel7-0-0_ph.dta")
+datCV<-read_dta("//bfh.ch/data/LFE/G/Research-HE/data/SHARE/rel7-0-0/sharew7_rel7-0-0/sharew7_rel7-0-0_ALL_datasets_stata/sharew7_rel7-0-0_cv_r.dta")
 
 
 #Filter Swiss observations
 datHC<-datHC %>% filter(as_factor(datHC$country)=="Switzerland")
-datXT<-datXT %>% filter(as_factor(datXT$country)=="Switzerland")
 datPH<-datPH %>% filter(as_factor(datPH$country)=="Switzerland")
+datCV<-datCV %>% filter(as_factor(datCV$country)=="Switzerland")
+
+
+#Remove variables that are duplicated accross datasets
+#datHC2<-cbind(datHC[,1],datHC[,8:71])
+#datCF2<-cbind(datCF[,1],datCF[,7:37])
+#datMH2<-cbind(datMH[,1],datMH[,7:27])
+#datBR2<-cbind(datBR[,1],datBR[,7:25])
+#datGS2<-cbind(datGS[,1],datGS[,7:23])
+#datPH2<-cbind(datPH[,1],datPH[,7:196])
 
 
 #Construct working database
-dat_SHARE_ChinSwee<-merge(datPH, datHC, by="mergeid")
-dat_SHARE_ChinSwee<-full_join(datXT,dat_SHARE_ChinSwee,by="mergeid")
+dat_SHARE_ChinSwee<-merge(cbind(datPH[,1],datPH[,7:196]), cbind(datHC[,1],datHC[,8:71]), by="mergeid",all=TRUE)
+dat_SHARE_ChinSwee<-merge(datCV,dat_SHARE_ChinSwee,by="mergeid",all=TRUE)
 
 
 
@@ -177,9 +182,6 @@ dat_SHARE_ChinSwee$d<-ifelse(dat_SHARE_ChinSwee$ph089d1==1,1,0)
 # 1     Selected
 
 
-####Joël, please double-check the chronic illnesses specified. The numbers are not the same as your pdf. 
-#If you change something, please be consistent and change it in both functions here.
-
 dat_SHARE_ChinSwee$e<-ifelse( (dat_SHARE_ChinSwee$ph006d1==1
                                |dat_SHARE_ChinSwee$ph006d2==1
                                |dat_SHARE_ChinSwee$ph006d3==1
@@ -226,8 +228,9 @@ dat_SHARE_ChinSwee$f<-ifelse(is.na(dat_SHARE_ChinSwee$e),0,1)
 #f=1  Response regarding chronic diseases recorded 
 #f=0  No record of chronic disease response
 
-dat_SHARE_ChinSwee$f2<-ifelse(is.na(dat_SHARE_ChinSwee$e)&dat_SHARE_ChinSwee$language_xt>0,1,0)
+dat_SHARE_ChinSwee$f2<-ifelse(is.na(dat_SHARE_ChinSwee$e)&dat_SHARE_ChinSwee$deceased==1,1,0)
 #f2=1  No record of chronic disease response because person is dead 
+#f2=0  Else#f2=1  No record of chronic disease response because person is dead 
 #f2=0  Else
 
 
@@ -367,10 +370,10 @@ table(dat_SHARE_ChinSwee$j)
 
 
 ########################################################################
-#k#############language_xt
+#k#############deceased
 
 
-dat_SHARE_ChinSwee$k<-is.na(ifelse(dat_SHARE_ChinSwee$language_xt>0,1,0))
+dat_SHARE_ChinSwee$k<-dat_SHARE_ChinSwee$deceased==0
 
 
 
@@ -413,6 +416,6 @@ dat_SHARE_ChinSwee$health_state<-
 
 table(dat_SHARE_ChinSwee$health_state)
 
-
+detach()
 rm(list = ls(all.names = TRUE)) #will clear all objects includes hidden objects.
 gc() #free up memrory and report the memory usage.

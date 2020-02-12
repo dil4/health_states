@@ -250,9 +250,11 @@ dat_SHARE_ld$f<-ifelse(is.na(dat_SHARE_ld$e),0,1)
 #f=1  Response regarding chronic diseases recorded 
 #f=0  No record of chronic disease response
 
-dat_SHARE_ld$f2<-ifelse(is.na(dat_SHARE_ld$e)&dat_SHARE_ld$deceases==0,1,0)
+dat_SHARE_ld$f2<-ifelse(is.na(dat_SHARE_ld$e)&dat_SHARE_ld$deceased==1,1,0)
 #f2=1  No record of chronic disease response because person is dead 
 #f2=0  Else
+
+table(dat_SHARE_ld$f2)
 
 
 
@@ -477,6 +479,6 @@ table(dat_SHARE_ld$health_state)
 lize<-dat_SHARE_ld[which(dat_SHARE_ld$health_state=="lost"),]
 
 
-
+detach()
 rm(list = ls(all.names = TRUE)) #will clear all objects includes hidden objects.
 gc() #free up memrory and report the memory usage.
