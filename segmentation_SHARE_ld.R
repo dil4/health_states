@@ -17,7 +17,7 @@ if (!require("data.table")) install.packages("data.table") # Installs data.table
 
 
 library(haven)
-#library(foreign)
+library(foreign)
 #library(dplyr)
 #library(corrr)
 #library(ggplot2)
@@ -364,80 +364,7 @@ table(dat_SHARE_ld$i)
 
 
 
-
-
-
-########################################################################
-#j#############Frailty Indicators
-
-
-dat_SHARE_ld$age_int ###Age at interview
-
-list(dat_SHARE_ld$gender) ###Gender
-#value      label
-#-2    Refusal
-#-1 Don't know
-#1       Male
-#2     Female
-
-list(dat_SHARE_ld$gs004_) ###DominantHand
-#value         label
-#-2       Refusal
-#-1    Don't know
-# 1    Right hand
-# 2     Left hand
-# 3 Ambidexterity
-
-#Participant is deemed to have low hand grip strength if the average measurement for both the dominant hand 
-#as well as the average measurement for the non-dominant hand is less or equal to one standard deviation 
-#less than the average normative age-sex-dominance-specific values for the Swiss population as determined by:
-#Werle, S., Goldhahn, J., Drerup, S., Simmen, B.R., Sprott, H. and Herren, D.B., 2009. Age-and gender-specific 
-#normative data of grip and pinch strength in a healthy adult Swiss population. Journal of Hand Surgery 
-#(European Volume), 34(1), pp.76-84.
-
-
-dat_SHARE_ld$l_ave<-(dat_SHARE_ld$gs006_+dat_SHARE_ld$gs007_)/2
-dat_SHARE_ld$r_ave<-(dat_SHARE_ld$gs008_+dat_SHARE_ld$gs009_)/2
-
-####Dominant hand
-dat_SHARE_ld$d_ave<-isTRUE(dat_SHARE_ld$gs004_==2)*l_ave+(1-isTRUE(dat_SHARE_ld$gs004_==2))*r_ave
-#label(d_ave) <- "Average handgrip dominant hand"
-
-dat_SHARE_ld$row_num<-(dat_hand_grip$Gender==dat_SHARE_ld$gender&dat_hand_grip$Age_min<=dat_SHARE_ld$age_int&dat_hand_grip$Age_max>=dat_SHARE_ld$age_int&dat_hand_grip$Hand=="D")
-dat_SHARE_ld$a<-dat_SHARE_ld$gender
-d_mean_hand_grip<-dat_hand_grip[(dat_hand_grip$Gender==dat_SHARE_ld$gender&dat_hand_grip$Age_min<=dat_SHARE_ld$age_int&dat_hand_grip$Age_max>=dat_SHARE_ld$age_int&dat_hand_grip$Hand=="D"),"Mean"]
-
-for (i in 1:nrow(dat_SHARE_ld)){
-  #dat_SHARE_ld[i,"a"]<-which((dat_hand_grip$Gender==dat_SHARE_ld[i,"gender"]&dat_hand_grip$Age_min<=dat_SHARE_ld[i,"age_int"]&dat_hand_grip$Age_max>=dat_SHARE_ld[i,"age_int"]&dat_hand_grip$Hand=="D")==TRUE)
-  #print(i)
-  print(gender dat_SHARE_ld[i,"gender"], int age dat_SHARE_ld[i,"age_int"])
-  #dat_SHARE_ld[i,"a"]<-print(which((dat_hand_grip$Gender==dat_SHARE_ld[i,"gender"]&dat_hand_grip$Age_min<=dat_SHARE_ld[i,"age_int"]&dat_hand_grip$Age_max>=dat_SHARE_ld[i,"age_int"]&dat_hand_grip$Hand=="D")==TRUE))
-}
-
-for (i in 1:nrow(dat_SHARE_ld))
-{dat_SHARE_ld[i,"lize"]<-which((dat_hand_grip$Gender==dat_SHARE_ld[i,"gender"]&dat_hand_grip$Age_min<=dat_SHARE_ld[i,"age_int"]&dat_hand_grip$Age_max>=dat_SHARE_ld[i,"age_int"]&dat_hand_grip$Hand=="D")==TRUE)}
-
-which((dat_hand_grip$Gender==dat_SHARE_ld[4,"gender"]&dat_hand_grip$Age_min<=dat_SHARE_ld[4,"age_int"]&dat_hand_grip$Age_max>=dat_SHARE_ld[4,"age_int"]&dat_hand_grip$Hand=="D")==TRUE)
-
-
-d_std_hand_grip<-dat_hand_grip[(dat_hand_grip$Gender==dat_SHARE_ld$gender&dat_hand_grip$Age_min<=dat_SHARE_ld$age_int&dat_hand_grip$Age_max>=dat_SHARE_ld$age_int&dat_hand_grip$Hand=="D"),"SD_AbsoluteVal"]
-dat_SHARE_ld$d_hand_grip_threshhold<-mean_hand_grip-std_hand_grip
-
-dat_SHARE_ld$d_low_hand_grip<-(dat_SHARE_ld$d_hand_grip_threshhold>=dat_SHARE_ld$d_ave)
-
-
-nd_ave<-isTRUE(dat_SHARE_ld$gs004_==2)*r_ave+(1-isTRUE(dat_SHARE_ld$gs004_==2))*l_ave
-#label(d_ave) <- "Average handgrip non-dominant hand"
-
-d_mean_hand_grip<-dat_hand_grip[(dat_hand_grip$Gender==dat_SHARE_ld$gender&dat_hand_grip$Age_min<=dat_SHARE_ld$age_int&dat_hand_grip$Age_max>=dat_SHARE_ld$age_int&dat_hand_grip$Hand=="D"),"Mean"]
-d_std_hand_grip<-dat_hand_grip[(dat_hand_grip$Gender==dat_SHARE_ld$gender&dat_hand_grip$Age_min<=dat_SHARE_ld$age_int&dat_hand_grip$Age_max>=dat_SHARE_ld$age_int&dat_hand_grip$Hand=="D"),"SD_AbsoluteVal"]
-d_hand_grip_threshhold<-mean_hand_grip-std_hand_grip
-
-nd_mean_hand_grip<-dat_hand_grip[(dat_hand_grip$Gender==dat_SHARE_ld$gender&dat_hand_grip$Age_min<=dat_SHARE_ld$age_int&dat_hand_grip$Age_max>=dat_SHARE_ld$age_int&dat_hand_grip$Hand=="ND"),"Mean"]
-nd_std_hand_grip<-dat_hand_grip[(dat_hand_grip$Gender==dat_SHARE_ld$gender&dat_hand_grip$Age_min<=dat_SHARE_ld$age_int&dat_hand_grip$Age_max>=dat_SHARE_ld$age_int&dat_hand_grip$Hand=="ND"),"SD_AbsoluteVal"]
-nd_hand_grip_threshhold<-mean_hand_grip-std_hand_grip 
-
-#j1#############HC013_TiminHos
+#j#############HC013_TiminHos
 #Wie oft sind Sie während den letzten 12 Monaten für mindestens eine Nacht im Spital gewesen?
 
 #How often have you spent at least one night in hospital during the last 12 months?
@@ -481,6 +408,167 @@ table(dat_SHARE_ld$j)
 #1    2 
 #1085 1317
 
+
+########################################################################
+#j#############Frailty Indicators
+
+#Frailty was defined as a clinical syndrome in which three or more of the following criteria were present: 
+#unintentional weight loss (10 lbs in past year), 
+#self-reported exhaustion, 
+#weakness (grip strength), 
+#slow walking speed, 
+#and low physical activity.
+
+#Fried, L.P., Tangen, C.M., Walston, J., Newman, A.B., Hirsch, C., Gottdiener, J., Seeman, T., Tracy, R., 
+#Kop, W.J., Burke, G. and McBurnie, M.A., 2001. 
+#Frailty in older adults: evidence for a phenotype. 
+#The Journals of Gerontology Series A: Biological Sciences and Medical Sciences, 56(3), pp.M146-M157.
+
+
+###Cognitive function <- Differences in cognitive performance and cognitive decline across European regions: a population-based prospective cohort study
+
+########################################################################
+#j1############Hand Grip Strength
+
+#Participant is deemed to have low hand grip strength if the average measurement for both the dominant hand 
+#as well as the average measurement for the non-dominant hand is less or equal to one standard deviation 
+#less than the average normative age-sex-dominance-specific values for the Swiss population as determined by:
+#Werle, S., Goldhahn, J., Drerup, S., Simmen, B.R., Sprott, H. and Herren, D.B., 2009. Age-and gender-specific 
+#normative data of grip and pinch strength in a healthy adult Swiss population. Journal of Hand Surgery 
+#(European Volume), 34(1), pp.76-84.
+
+####Left hand average
+dat_SHARE_ld$r_ave<-(dat_SHARE_ld$gs008_+dat_SHARE_ld$gs009_)/2
+####Right hand average
+dat_SHARE_ld$l_ave<-(dat_SHARE_ld$gs006_+dat_SHARE_ld$gs007_)/2
+
+
+####Dominant hand
+dat_SHARE_ld$d_ave<-isTRUE(dat_SHARE_ld$gs004_==2)*dat_SHARE_ld$l_ave+(1-isTRUE(dat_SHARE_ld$gs004_==2))*dat_SHARE_ld$r_ave
+#label(d_ave) <- "Average handgrip dominant hand"
+
+
+###Assign people with only one hand measurement to "dominant-hand"
+###Identify the hand-measurement of people who only have one hand-measurement
+hands_tested<-2-1*(is.na(dat_SHARE_ld$r_ave)==TRUE)-1*(is.na(dat_SHARE_ld$l_ave)==TRUE)
+one_hand<-which(hands_tested==1) ###rows with people who have only one hand-measurement
+###people who's one hand measurement is the left hand
+one_hand_l<-one_hand[!is.na(dat_SHARE_ld[one_hand,"l_ave"]>0)]
+dat_SHARE_ld[one_hand_l,"d_ave"]<-dat_SHARE_ld[one_hand_l,"l_ave"]
+###people who's one hand measurement is the right hand
+one_hand_r<-one_hand[!is.na(dat_SHARE_ld[one_hand,"r_ave"]>0)]
+dat_SHARE_ld[one_hand_r,"d_ave"]<-dat_SHARE_ld[one_hand_r,"r_ave"]
+
+
+for (i in 1:nrow(dat_SHARE_ld))
+{if(dat_SHARE_ld[i,"age_int"]<0){dat_SHARE_ld[i,"d_grip_test_threshhold"]<-NA}
+  else
+  {mean_hand_grip<-dat_hand_grip[(which((dat_hand_grip$Gender==dat_SHARE_ld[i,"gender"]&dat_hand_grip$Age_min<=dat_SHARE_ld[i,"age_int"]&dat_hand_grip$Age_max>=dat_SHARE_ld[i,"age_int"]&dat_hand_grip$Hand=="D")==TRUE)),"Mean"]
+  std_hand_grip<-dat_hand_grip[(which((dat_hand_grip$Gender==dat_SHARE_ld[i,"gender"]&dat_hand_grip$Age_min<=dat_SHARE_ld[i,"age_int"]&dat_hand_grip$Age_max>=dat_SHARE_ld[i,"age_int"]&dat_hand_grip$Hand=="D")==TRUE)),"SD_AbsoluteVal"] 
+  dat_SHARE_ld[i,"d_grip_test_threshhold"]<-mean_hand_grip-std_hand_grip}
+}
+mean_hand_grip<-NULL
+std_hand_grip<-NULL
+#table(dat_SHARE_ld$d_grip_test_threshhold)
+
+#d_grip_strength = 1 if dominant hand strong enough
+#d_grip_strength = 0 if dominant hand not strong enough
+dat_SHARE_ld$d_grip_strength<-(dat_SHARE_ld$d_ave>dat_SHARE_ld$d_grip_test_threshhold)*1+(1-(dat_SHARE_ld$d_ave>dat_SHARE_ld$d_grip_test_threshhold))*0
+
+####Non-dominant hand
+dat_SHARE_ld$nd_ave<-isTRUE(dat_SHARE_ld$gs004_==2)*dat_SHARE_ld$r_ave+(1-isTRUE(dat_SHARE_ld$gs004_==2))*dat_SHARE_ld$l_ave
+#label(nd_ave) <- "Average handgrip non-dominant hand"
+
+for (i in 1:nrow(dat_SHARE_ld))
+{if(dat_SHARE_ld[i,"age_int"]<0){dat_SHARE_ld[i,"nd_grip_test_threshhold"]<-NA}
+  else
+  {mean_hand_grip<-dat_hand_grip[(which((dat_hand_grip$Gender==dat_SHARE_ld[i,"gender"]&dat_hand_grip$Age_min<=dat_SHARE_ld[i,"age_int"]&dat_hand_grip$Age_max>=dat_SHARE_ld[i,"age_int"]&dat_hand_grip$Hand=="ND")==TRUE)),"Mean"]
+  std_hand_grip<-dat_hand_grip[(which((dat_hand_grip$Gender==dat_SHARE_ld[i,"gender"]&dat_hand_grip$Age_min<=dat_SHARE_ld[i,"age_int"]&dat_hand_grip$Age_max>=dat_SHARE_ld[i,"age_int"]&dat_hand_grip$Hand=="ND")==TRUE)),"SD_AbsoluteVal"] 
+  dat_SHARE_ld[i,"nd_grip_test_threshhold"]<-mean_hand_grip-std_hand_grip}
+}
+mean_hand_grip<-NULL
+std_hand_grip<-NULL
+#table(dat_SHARE_ld$d_grip_test_threshhold)
+
+#nd_grip_strength = 1 if non-dominant hand strong enough
+#nd_grip_strength = 0 if non-dominant hand not strong enough
+dat_SHARE_ld$nd_grip_strength<-(dat_SHARE_ld$nd_ave>dat_SHARE_ld$nd_grip_test_threshhold)*1+(1-(dat_SHARE_ld$nd_ave>dat_SHARE_ld$nd_grip_test_threshhold))*0
+
+
+dat_SHARE_ld$j1<-1*(dat_SHARE_ld$d_grip_strength==0&dat_SHARE_ld$nd_grip_strength==0)
+#j1=1 no hand passed the grip strength test
+#j1=0 at Least one hand passed grip strength test
+
+table(dat_SHARE_ld$j1)
+which(dat_SHARE_ld$j1==1)
+
+lize<-dat_SHARE_ld[which(dat_SHARE_ld$j1==1),"health_state"]
+table(lize)
+table(dat_SHARE_ld$health_state)
+
+
+
+########################################################################
+#j2############PH003_HealthGen2
+#Würden Sie sagen, Ihr Gesundheitszustand ist...
+
+#Would you say that your health is...
+
+
+#list(dat_SHARE_ld$ph003_)
+#value      label
+#-2    Refusal
+#-1 Don't know
+# 1  Excellent
+# 2  Very good
+# 3       Good
+# 4       Fair
+# 5       Poor
+
+#table(dat_SHARE_ld$ph003_)
+#TABLE
+#-2   -1    1    2    3    4    5 
+# 1    4  230  609 1024  416  111 
+
+dat_SHARE_ld$j2<-ifelse(dat_SHARE_ld$ph003_==5,1,0)
+
+
+#table(dat_SHARE_ld$j2)
+#j2=1  self-assessed health rated as poor
+#j2=0  self-assessed health rated as not poor
+#      & Don't know + Refusal
+
+
+
+########################################################################
+#j3############PH003_HealthGen2
+#Würden Sie sagen, Ihr Gesundheitszustand ist...
+
+#Would you say that your health is...
+
+
+#list(dat_SHARE_ld$ph003_)
+#value      label
+#-2    Refusal
+#-1 Don't know
+# 1  Excellent
+# 2  Very good
+# 3       Good
+# 4       Fair
+# 5       Poor
+
+#table(dat_SHARE_ld$ph003_)
+#TABLE
+#-2   -1    1    2    3    4    5 
+# 1    4  230  609 1024  416  111 
+
+dat_SHARE_ld$j2<-ifelse(dat_SHARE_ld$ph003_==5,1,0)
+
+
+#table(dat_SHARE_ld$j2)
+#j2=1  self-assessed health rated as poor
+#j2=0  self-assessed health rated as not poor
+#      & Don't know + Refusal
 
 
 
