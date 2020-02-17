@@ -21,7 +21,7 @@ library(foreign)
 library(dplyr)
 #library(corrr)
 #library(ggplot2)
-#library(data.table)
+library(data.table)
 #library(tidyverse)
 
 
@@ -274,7 +274,6 @@ datCV_w1<-rbind.data.frame(datCV_w1[datCV_w1$interview==1,],datCV_w1[datCV_w1$in
 
 
 
-dat_hand_grip<-read_csv("//bfh.ch/data/LFE/Users/dil4/health_states/health_states/HandGrip_Swiss.csv")
 
 
 
